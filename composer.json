@@ -1,0 +1,20 @@
+{   "name": "ongom/mailer",
+    "description": "A PHP library that works similar to Nodemailer for node js, for sending emails.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mailer\\": "src/code"
+        }
+    },
+    "authors": [
+        {
+            "name": "ongom felix"
+        }
+    ],
+    "minimum-stability": "stable", 
+    "keywards":["emails","gmail"],
+    "require": {
+        "phpmailer/phpmailer": "^6.10"
+    }
+}
