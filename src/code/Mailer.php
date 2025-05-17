@@ -8,7 +8,6 @@ require 'vendor/autoload.php';
 
 class Mailer {
     private $mailer;
-    private $config = [];
 
     public $from;
     public $fromName;
@@ -64,8 +63,37 @@ class Mailer {
         $this->mailer->Password = $auth['pass'] ?? '';
     }
 
+    private function validate() {
+        if (empty($this->from)) {
+            throw new Exception("Sender email 'from' is required.");
+        }
+        if (empty($this->to)) {
+            throw new Exception("At least one recipient 'to' is required.");
+        }
+        if (empty($this->subject)) {
+            throw new Exception("Email 'subject' is required.");
+        }
+        if (empty($this->text) && empty($this->html)) {
+            throw new Exception("Either 'text' or 'html' content must be provided.");
+        }
+    }
+
+    public function reset() {
+        $this->from = null;
+        $this->fromName = null;
+        $this->to = [];
+        $this->cc = [];
+        $this->bcc = [];
+        $this->replyTo = null;
+        $this->replyToName = null;
+        $this->subject = null;
+        $this->text = null;
+        $this->html = null;
+        $this->attachments = [];
+        $this->images = [];
+    }
+
     public function send($mailOptions = []) {
-        // If $mailOptions is given, override properties
         if (!empty($mailOptions)) {
             foreach ($mailOptions as $key => $value) {
                 $this->$key = $value;
@@ -73,11 +101,14 @@ class Mailer {
         }
 
         try {
+            $this->validate();
+
+            $this->mailer->clearAllRecipients();
+            $this->mailer->clearAttachments();
+
             $this->mailer->setFrom($this->from, $this->fromName ?? '');
 
-            // To
-            $toList = is_array($this->to) ? $this->to : [$this->to];
-            foreach ($toList as $to) {
+            foreach ((array) $this->to as $to) {
                 if (is_array($to)) {
                     $this->mailer->addAddress($to['email'], $to['name'] ?? '');
                 } else {
@@ -85,7 +116,6 @@ class Mailer {
                 }
             }
 
-            // CC
             foreach ((array) $this->cc as $cc) {
                 if (is_array($cc)) {
                     $this->mailer->addCC($cc['email'], $cc['name'] ?? '');
@@ -94,7 +124,6 @@ class Mailer {
                 }
             }
 
-            // BCC
             foreach ((array) $this->bcc as $bcc) {
                 if (is_array($bcc)) {
                     $this->mailer->addBCC($bcc['email'], $bcc['name'] ?? '');
@@ -103,22 +132,19 @@ class Mailer {
                 }
             }
 
-            // Reply-To
             if (!empty($this->replyTo)) {
                 $this->mailer->addReplyTo($this->replyTo, $this->replyToName ?? '');
             }
 
-            $this->mailer->Subject = $this->subject ?? '';
-            $this->mailer->Body = $this->html ?? $this->text ?? '';
+            $this->mailer->Subject = $this->subject;
+            $this->mailer->Body = $this->html ?? $this->text;
             $this->mailer->AltBody = $this->text ?? strip_tags($this->mailer->Body);
             $this->mailer->isHTML(isset($this->html));
 
-            // Attachments
             foreach ((array) $this->attachments as $filePath) {
                 $this->mailer->addAttachment($filePath);
             }
 
-            // Inline images
             foreach ((array) $this->images as $image) {
                 $this->mailer->addEmbeddedImage(
                     $image['path'],
@@ -130,7 +156,9 @@ class Mailer {
             }
 
             $this->mailer->send();
+            $this->reset();
             return true;
+
         } catch (Exception $e) {
             return 'Message could not be sent. Mailer Error: ' . $this->mailer->ErrorInfo;
         }
