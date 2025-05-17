@@ -7,12 +7,19 @@ It is what is described above, it uses [PHPMailer](https://packagist.org/package
 You're now fully equipped with a custom, flexible mail system using PHP and PHPMailer that supports:
 
 ✅ Gmail and other providers.
+
 ✅ Plain text + HTML emails.
+
 ✅ Reply-To, CC, BCC.
+
 ✅ Multiple recipients.
+
 ✅ File attachments.
+
 ✅ Inline images (e.g., logos in HTML body).
+
 ✅ Sending multiple email.
+
 ✅ Images.
 
 
