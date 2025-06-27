@@ -38,7 +38,6 @@ $mailer = new Mailer([
     ]
 ]);
 // 
-// 
 $result = $mailer->send([
     'from' => 'your-email@gmail.com',
     'fromName' => 'Your Name',
@@ -84,10 +83,8 @@ $mail = new Mailer([
     'service' => 'gmail',
     'auth' => ['user' => 'you@gmail.com', 'pass' => 'your-app-password']
 ]);
-$mail = new MailTransport([
-    'service' => 'gmail',
-    'auth' => ['user' => 'you@gmail.com', 'pass' => 'your-app-password']
-]);
+
+//
 
 $mail->from = 'you@gmail.com';
 $mail->fromName = 'Your Name';
